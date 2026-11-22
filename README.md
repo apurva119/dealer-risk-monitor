@@ -1,122 +1,10 @@
-````markdown
 # Dealer Risk Monitor
 
-Dealer Risk Monitor predicts which dealers are most likely to become at risk within the next 13 weeks using machine learning (Logistic Regression and XGBoost). The model ranks dealers by predicted risk, helping reviewers focus their limited weekly review capacity on the highest-priority cases.
+> A machine learning application for prioritising high-risk dealers using temporal modelling and an interactive Streamlit dashboard.
 
-![Dashboard Overview](images/overview.png)
+Dealer Risk Monitor predicts which dealers are most likely to become at risk within the next **13 weeks** using machine learning (Logistic Regression and XGBoost). The model ranks dealers by predicted risk, helping reviewers focus their limited weekly review capacity on the highest-priority cases.
 
-> **Live demo:** Coming soon. The application currently runs locally using Streamlit.
-
----
-
-## Highlights
-
-- Time-aware evaluation using a temporal train/test split
-- Verified 13-week purge gap matching the prediction horizon
-- XGBoost and Logistic Regression benchmarked against a rule-based baseline
-- Business-focused evaluation using PR-AUC and Weekly Recall@25
-- Interactive Streamlit dashboard for operational risk review
-- Downloadable ranked review queue for operational teams
-
----
-
-## Business Problem
-
-The goal of Dealer Risk Monitor is to identify dealers that are likely to become at risk within the next 13 weeks so that business teams can intervene before payment issues become more severe.
-
-Each week, every dealer receives a predicted risk score. Because reviewers have capacity to investigate only a limited number of dealers, the model ranks dealers by predicted risk and prioritises the top 25 dealers for manual review.
-
-The project is evaluated using ranking-based metrics that reflect this operational workflow rather than overall classification accuracy.
-
----
-
-## Dataset
-
-The project uses anonymised dealer-level data for model development. The raw dataset is not included in this repository.
-
-Only the source code, trained artifacts, and demo predictions required to reproduce the dashboard are included.
-
-| Item | Value |
-|------|------:|
-| Test period | 46 weeks |
-| Dealers per week | ~464 |
-| At-risk dealers per week | ~3.6 (0.77%) |
-| Prediction horizon | 13 weeks |
-
-The dataset is highly imbalanced (0.77% positives), making PR-AUC and Weekly Recall@25 more informative than accuracy.
-
-A random Top-25 review queue would identify only about 5% of at-risk dealers.
-
----
-
-## Feature Engineering
-
-Features are engineered from historical dealer behaviour using rolling windows and trend-based statistics. Every feature at week **t** is computed only from information available at week **t**.
-
-Feature groups include:
-
-- **Payment behaviour:** average payment delay, payment delay trends and volatility, collection ratios over 4-, 8-, and 12-week windows.
-- **Ageing & delinquency:** days past due, overdue balance ratios, unpaid invoice counts, and outstanding balances.
-- **Business activity:** order trends, invoice volumes, GST turnover changes, and outstanding balance relative to business activity.
-- **External signals:** credit bureau scores, recent score changes, GST registration status, and active court cases.
-- **Peer context:** dealer performance relative to the portfolio median, including payment delays and credit scores.
-- **Dealer profile:** dealer size, credit terms, tenure, and geographic region.
-- **Calendar features:** cyclical month encodings to capture seasonality.
-
-All engineered features use only information available at the prediction week to avoid future information leakage.
-
----
-
-## Models
-
-- **Rule-based baseline:** ranks dealers using a manually designed risk score based on key payment and delinquency indicators.
-- Logistic Regression
-- XGBoost
-
----
-
-## Evaluation
-
-The models are evaluated using a strictly time-based split.
-
-### Temporal Split
-
-Training uses earlier weeks while testing uses later weeks. Random train/test splits are never used.
-
-### Purge Gap
-
-The temporal train/test split includes a **verified 13-week gap** between the final training week (**83**) and the first test week (**97**), matching the 13-week prediction horizon.
-
-The verification can be reproduced by running:
-
-```bash
-python check_split.py
-```
-
-The script verifies the temporal split boundary only. Feature engineering should also be reviewed separately to ensure every feature at week **t** uses only information available at week **t**.
-
-### Metrics
-
-The primary evaluation metrics are:
-
-- **PR-AUC**, appropriate for highly imbalanced datasets.
-- **Weekly Recall@25**, reflecting the operational review capacity of 25 dealers per week.
-
-### Statistical Comparison
-
-A paired bootstrap comparison between models has not yet been performed and is planned as future work.
-
----
-
-## Results
-
-| Model | PR-AUC | ROC-AUC | Weekly Recall@25 |
-|------|-------:|--------:|-----------------:|
-| Rule-based baseline | 0.824 | Not yet reported | Not yet reported |
-| Logistic Regression | 0.844 | Not yet reported | Not yet reported |
-| **XGBoost** | **0.849** | Not yet reported | Not yet reported |
-
-XGBoost achieved the highest PR-AUC (0.849), followed closely by Logistic Regression (0.844) and the rule-based baseline (0.824). While the performance improvement is modest, the machine learning models provide better prioritisation of the limited weekly review queue, enabling reviewers to focus on the dealers most likely to become at risk.
+> **Live Demo:** Coming soon. The application currently runs locally using Streamlit.
 
 ---
 
@@ -126,12 +14,129 @@ XGBoost achieved the highest PR-AUC (0.849), followed closely by Logistic Regres
 |----------|--------------|---------------|
 | ![](images/overview.png) | ![](images/queue.png) | ![](images/lookup.png) |
 
-### Features
+---
+
+## Highlights
+
+- Time-aware evaluation using a temporal train/test split
+- Verified 13-week purge gap matching the prediction horizon
+- Benchmarked a rule-based baseline, Logistic Regression, and XGBoost
+- Business-focused evaluation using PR-AUC and Weekly Recall@25
+- Interactive Streamlit dashboard for operational risk review
+- Downloadable ranked review queue for operational teams
+
+---
+## Key Results
+
+- PR-AUC improved from **0.824 (Rule-based)** to **0.849 (XGBoost)**
+- Predicts dealer risk **13 weeks in advance**
+- Evaluated using a leakage-free temporal split with a verified 13-week purge gap
+- Prioritises the Top-25 dealers each week for manual review
+
+---
+
+## Business Problem
+
+Operational teams have limited capacity to manually review dealers each week. The objective of this project is to identify dealers that are likely to become at risk within the next **13 weeks**, allowing reviewers to intervene before payment issues become more severe.
+
+Each week, every dealer receives a predicted risk score. Dealers are ranked by predicted risk, and the highest-risk dealers are prioritised for manual review.
+
+Because the objective is prioritisation rather than binary classification, the project is evaluated using ranking-based metrics that reflect the real operational workflow.
+
+---
+
+## Dataset
+
+This project uses anonymised dealer-level data. The raw dataset is proprietary and is **not included** in this repository.
+
+The repository contains only the source code, trained model artifacts, and demo prediction files required to reproduce the dashboard.
+
+| Item | Value |
+|------|------:|
+| Test period | 46 weeks |
+| Dealers per week | ~464 |
+| At-risk dealers per week | ~3.6 (0.77%) |
+| Prediction horizon | 13 weeks |
+
+The dataset is highly imbalanced (0.77% positives), making **PR-AUC** and **Weekly Recall@25** more informative than overall accuracy.
+
+A random Top-25 review queue would identify only about **5%** of at-risk dealers.
+
+---
+
+## Feature Engineering
+
+Features are engineered from historical dealer behaviour using rolling windows and trend-based statistics. Every feature at week **t** is computed using only information available at week **t**, preventing temporal data leakage.
+
+Feature groups include:
+
+- **Payment behaviour** – average payment delay, delay trends, delay volatility and collection ratios over rolling 4-, 8- and 12-week windows.
+- **Ageing & delinquency** – days past due, overdue balance ratios, unpaid invoice counts and outstanding balances.
+- **Business activity** – order trends, invoice volumes, GST turnover changes and outstanding balance relative to business activity.
+- **External signals** – credit bureau scores, recent score changes, GST registration status and active court cases.
+- **Peer context** – dealer performance relative to the portfolio median, including payment delays and credit scores.
+- **Dealer profile** – dealer size, credit terms, tenure and geographic region.
+- **Calendar features** – cyclical month encodings to capture seasonality.
+
+---
+
+## Models
+
+The following approaches were evaluated:
+
+- Rule-based baseline
+- Logistic Regression
+- XGBoost
+
+---
+
+## Evaluation
+
+Models are evaluated using a **strictly time-based train/test split**.
+
+### Temporal Split
+
+Training uses earlier weeks while testing uses later weeks. Random train/test splits are never used.
+
+### Purge Gap
+
+A verified **13-week purge gap** is maintained between the final training week (**83**) and the first testing week (**97**), matching the prediction horizon and preventing temporal leakage.
+
+The split can be verified by running:
+
+```bash
+python check_split.py
+```
+
+The script validates the temporal split boundary. Feature engineering is designed so that every feature at week **t** uses only information available at that time.
+
+### Metrics
+
+Primary evaluation metrics:
+
+- **PR-AUC** – appropriate for highly imbalanced datasets.
+- **Weekly Recall@25** – reflects the operational review capacity of reviewing only the top 25 dealers each week.
+
+---
+
+## Results
+
+| Model | PR-AUC |
+|------|-------:|
+| Rule-based baseline | 0.824 |
+| Logistic Regression | 0.844 |
+| **XGBoost** | **0.849** |
+
+XGBoost achieved the highest PR-AUC (0.849), followed closely by Logistic Regression (0.844) and the rule-based baseline (0.824). Although the improvement is modest, the machine learning models provide better prioritisation of the limited weekly review queue, enabling reviewers to focus on dealers most likely to become at risk.
+
+---
+
+## Dashboard Features
 
 - Adjustable High and Medium risk thresholds
 - Automatic risk tiers
 - Portfolio ranking
-- Ranked review queue
+- Ranked weekly review queue
 - CSV export
 - Dealer lookup
 - Dealer vs portfolio median comparison
@@ -139,13 +144,37 @@ XGBoost achieved the highest PR-AUC (0.849), followed closely by Logistic Regres
 
 The dashboard scores one prediction per dealer and presents a prioritised review queue for operational users.
 
-The committed demo predictions allow the dashboard to be explored without requiring access to the original training dataset.
+Demo prediction files are included, allowing the dashboard to run without access to the original dataset.
+
+---
+
+## Pipeline
+
+```text
+Raw Dealer Data
+        │
+        ▼
+Feature Engineering
+        │
+        ▼
+Temporal Train/Test Split
+        │
+        ▼
+Model Training
+(Logistic Regression / XGBoost)
+        │
+        ▼
+Risk Prediction
+        │
+        ▼
+Interactive Streamlit Dashboard
+```
 
 ---
 
 ## How to Run
 
-### Dashboard Only (uses committed demo predictions)
+### Dashboard
 
 ```bash
 python -m venv .venv
@@ -161,9 +190,9 @@ pip install -r requirements.txt
 streamlit run dashboard/app.py
 ```
 
-### Full Training Pipeline
+### Training Pipeline
 
-Place the raw source data under the `data/` directory before running the training pipeline. The raw dataset is not included in this repository.
+Place the raw source dataset inside the `data/` directory before running the training pipeline.
 
 ```bash
 pip install -r requirements-train.txt
@@ -184,6 +213,7 @@ python inference/predict.py
 - XGBoost
 - Streamlit
 - Plotly
+- Git
 
 ---
 
@@ -191,21 +221,14 @@ python inference/predict.py
 
 ```text
 dealer-risk-monitor/
-│
-├── dashboard/
-│   └── app.py
-├── models/
-├── inference/
-├── features/
-├── notebooks/
-├── artifacts/
-│   ├── risk_predictions.csv
-│   └── ranking_eval.png
-├── images/
-│   ├── overview.png
-│   ├── queue.png
-│   └── lookup.png
-├── data/
+├── dashboard/          # Streamlit application
+├── features/           # Feature engineering
+├── inference/          # Prediction pipeline
+├── models/             # Model training
+├── notebooks/          # Exploratory analysis
+├── artifacts/          # Saved models and predictions
+├── images/             # README screenshots
+├── data/               # Raw data (not included)
 ├── check_split.py
 ├── requirements.txt
 ├── requirements-train.txt
@@ -216,11 +239,11 @@ dealer-risk-monitor/
 
 ## Limitations
 
-- The dashboard explains **who** is high risk but not **why**.
+- The dashboard identifies **who** is high risk but not **why**.
 - Predictions are generated offline rather than through a live inference service.
 - Labels look 13 weeks ahead, so consecutive weekly observations for the same dealer are not independent.
-- The held-out test period contains relatively few positive events because dealer risk is rare, making performance estimates naturally more variable.
-- The rule-based baseline performs strongly, so the machine learning models provide only a modest improvement while offering better prioritisation of high-risk dealers.
+- Performance estimates are based on a relatively small number of positive events because dealer risk is rare.
+- The rule-based baseline already performs strongly, so the machine learning models provide incremental rather than dramatic performance improvements.
 
 ---
 
@@ -228,13 +251,13 @@ dealer-risk-monitor/
 
 - SHAP explanations for individual dealer predictions
 - Automated model retraining
-- Real-time inference pipeline
+- Real-time inference service
 - Model monitoring and drift detection
-- CI/CD deployment pipeline
+- CI/CD pipeline
+- Streamlit Cloud deployment
 
 ---
 
 ## License
 
 This project is released under the MIT License.
-````
