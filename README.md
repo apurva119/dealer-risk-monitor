@@ -1,10 +1,11 @@
+````markdown
 # Dealer Risk Monitor
 
-Dealer Risk Monitor predicts which dealers are most likely to become at risk within the next 13 weeks and ranks them by predicted risk, helping reviewers focus their limited weekly review capacity on the highest-priority cases.
+Dealer Risk Monitor predicts which dealers are most likely to become at risk within the next 13 weeks using machine learning (Logistic Regression and XGBoost). The model ranks dealers by predicted risk, helping reviewers focus their limited weekly review capacity on the highest-priority cases.
 
 ![Dashboard Overview](images/overview.png)
 
-> **Live demo:** TODO – add the Streamlit Cloud URL after deployment.
+> **Live demo:** Coming soon. The application currently runs locally using Streamlit.
 
 ---
 
@@ -21,28 +22,19 @@ Dealer Risk Monitor predicts which dealers are most likely to become at risk wit
 
 ## Business Problem
 
-**TODO**
+The goal of Dealer Risk Monitor is to identify dealers that are likely to become at risk within the next 13 weeks so that business teams can intervene before payment issues become more severe.
 
-Describe:
+Each week, every dealer receives a predicted risk score. Because reviewers have capacity to investigate only a limited number of dealers, the model ranks dealers by predicted risk and prioritises the top 25 dealers for manual review.
 
-- What "at-risk" means (how the target label is defined)
-- The 13-week prediction horizon
-- Who uses the predictions
-- Why only the Top-25 highest-risk dealers are reviewed each week
+The project is evaluated using ranking-based metrics that reflect this operational workflow rather than overall classification accuracy.
 
 ---
 
 ## Dataset
 
-**TODO**
+The project uses anonymised dealer-level data for model development. The raw dataset is not included in this repository.
 
-State whether the dataset is:
-
-- Real
-- Anonymised
-- Synthetic
-
-Explain any publishing restrictions if applicable.
+Only the source code, trained artifacts, and demo predictions required to reproduce the dashboard are included.
 
 | Item | Value |
 |------|------:|
@@ -51,7 +43,7 @@ Explain any publishing restrictions if applicable.
 | At-risk dealers per week | ~3.6 (0.77%) |
 | Prediction horizon | 13 weeks |
 
-The dataset is highly imbalanced (0.77% positives), making PR-AUC and Recall@25 more informative than accuracy.
+The dataset is highly imbalanced (0.77% positives), making PR-AUC and Weekly Recall@25 more informative than accuracy.
 
 A random Top-25 review queue would identify only about 5% of at-risk dealers.
 
@@ -59,23 +51,25 @@ A random Top-25 review queue would identify only about 5% of at-risk dealers.
 
 ## Feature Engineering
 
-**TODO**
+Features are engineered from historical dealer behaviour using rolling windows and trend-based statistics. Every feature at week **t** is computed only from information available at week **t**.
 
-Describe the feature groups, for example:
+Feature groups include:
 
-- Payment behaviour
-- Dealer activity
-- Historical trends
-- Rolling statistics
-- Portfolio characteristics
+- **Payment behaviour:** average payment delay, payment delay trends and volatility, collection ratios over 4-, 8-, and 12-week windows.
+- **Ageing & delinquency:** days past due, overdue balance ratios, unpaid invoice counts, and outstanding balances.
+- **Business activity:** order trends, invoice volumes, GST turnover changes, and outstanding balance relative to business activity.
+- **External signals:** credit bureau scores, recent score changes, GST registration status, and active court cases.
+- **Peer context:** dealer performance relative to the portfolio median, including payment delays and credit scores.
+- **Dealer profile:** dealer size, credit terms, tenure, and geographic region.
+- **Calendar features:** cyclical month encodings to capture seasonality.
 
-State that every feature at week **t** is computed only from information available at week **t**.
+All engineered features use only information available at the prediction week to avoid future information leakage.
 
 ---
 
 ## Models
 
-- Rule-based baseline (**TODO:** describe the rule)
+- **Rule-based baseline:** ranks dealers using a manually designed risk score based on key payment and delinquency indicators.
 - Logistic Regression
 - XGBoost
 
@@ -85,13 +79,11 @@ State that every feature at week **t** is computed only from information availab
 
 The models are evaluated using a strictly time-based split.
 
-### Temporal split
+### Temporal Split
 
-Training uses earlier weeks while testing uses later weeks.
+Training uses earlier weeks while testing uses later weeks. Random train/test splits are never used.
 
-Random train/test splits are never used.
-
-### Purge gap
+### Purge Gap
 
 The temporal train/test split includes a **verified 13-week gap** between the final training week (**83**) and the first test week (**97**), matching the 13-week prediction horizon.
 
@@ -107,14 +99,12 @@ The script verifies the temporal split boundary only. Feature engineering should
 
 The primary evaluation metrics are:
 
-- **PR-AUC**, appropriate for a 0.77% positive rate
-- **Weekly Recall@25**, reflecting the operational review capacity of 25 dealers per week
+- **PR-AUC**, appropriate for highly imbalanced datasets.
+- **Weekly Recall@25**, reflecting the operational review capacity of 25 dealers per week.
 
-### Statistical comparison
+### Statistical Comparison
 
-**TODO**
-
-Report the paired bootstrap confidence interval comparing PR-AUC between models.
+A paired bootstrap comparison between models has not yet been performed and is planned as future work.
 
 ---
 
@@ -122,19 +112,11 @@ Report the paired bootstrap confidence interval comparing PR-AUC between models.
 
 | Model | PR-AUC | ROC-AUC | Weekly Recall@25 |
 |------|-------:|--------:|-----------------:|
-| Rule-based baseline | 0.824 | TODO | TODO |
-| Logistic Regression | 0.844 | TODO | TODO |
-| XGBoost | **0.849** | TODO | TODO |
+| Rule-based baseline | 0.824 | Not yet reported | Not yet reported |
+| Logistic Regression | 0.844 | Not yet reported | Not yet reported |
+| **XGBoost** | **0.849** | Not yet reported | Not yet reported |
 
-**TODO**
-
-Summarise the practical findings.
-
-Suggested wording (adapt after your statistical comparison):
-
-> All three approaches performed strongly on the held-out temporal test set. XGBoost achieved the highest PR-AUC, although the improvement over Logistic Regression and the rule-based baseline was modest. The primary benefit of the machine learning models is improved prioritisation of the weekly review queue rather than a dramatic increase in predictive performance.
-
-Also report the practical improvement, such as the number of additional at-risk dealer-weeks identified during the 46-week test period.
+XGBoost achieved the highest PR-AUC (0.849), followed closely by Logistic Regression (0.844) and the rule-based baseline (0.824). While the performance improvement is modest, the machine learning models provide better prioritisation of the limited weekly review queue, enabling reviewers to focus on the dealers most likely to become at risk.
 
 ---
 
@@ -157,11 +139,13 @@ Also report the practical improvement, such as the number of additional at-risk 
 
 The dashboard scores one prediction per dealer and presents a prioritised review queue for operational users.
 
+The committed demo predictions allow the dashboard to be explored without requiring access to the original training dataset.
+
 ---
 
 ## How to Run
 
-### Dashboard only (uses committed demo predictions)
+### Dashboard Only (uses committed demo predictions)
 
 ```bash
 python -m venv .venv
@@ -177,11 +161,9 @@ pip install -r requirements.txt
 streamlit run dashboard/app.py
 ```
 
-### Full training pipeline
+### Full Training Pipeline
 
-**TODO**
-
-Describe where the raw data should be placed inside `data/`.
+Place the raw source data under the `data/` directory before running the training pipeline. The raw dataset is not included in this repository.
 
 ```bash
 pip install -r requirements-train.txt
@@ -212,27 +194,21 @@ dealer-risk-monitor/
 │
 ├── dashboard/
 │   └── app.py
-│
 ├── models/
-│
 ├── inference/
-│
+├── features/
 ├── notebooks/
-│
 ├── artifacts/
 │   ├── risk_predictions.csv
 │   └── ranking_eval.png
-│
 ├── images/
 │   ├── overview.png
 │   ├── queue.png
 │   └── lookup.png
-│
 ├── data/
-│
+├── check_split.py
 ├── requirements.txt
 ├── requirements-train.txt
-├── check_split.py
 └── README.md
 ```
 
@@ -243,8 +219,8 @@ dealer-risk-monitor/
 - The dashboard explains **who** is high risk but not **why**.
 - Predictions are generated offline rather than through a live inference service.
 - Labels look 13 weeks ahead, so consecutive weekly observations for the same dealer are not independent.
-- **TODO:** Report the number of positive events in the test period.
-- **TODO:** Discuss the simplicity of the rule-based baseline and the relatively small performance improvement achieved by the machine learning models.
+- The held-out test period contains relatively few positive events because dealer risk is rare, making performance estimates naturally more variable.
+- The rule-based baseline performs strongly, so the machine learning models provide only a modest improvement while offering better prioritisation of high-risk dealers.
 
 ---
 
@@ -255,3 +231,10 @@ dealer-risk-monitor/
 - Real-time inference pipeline
 - Model monitoring and drift detection
 - CI/CD deployment pipeline
+
+---
+
+## License
+
+This project is released under the MIT License.
+````
