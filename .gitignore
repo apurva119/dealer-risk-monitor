@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Generated data (anyone can regenerate it with the simulator; seed is fixed)
+data/*
+!data/.gitkeep
+*.parquet
+*.csv
+
+# Trained model binaries (regenerate with models/train_models.py).
+# artifacts/metrics.json and artifacts/*.png ARE committed so the README can show results.
+artifacts/*.joblib
+artifacts/xgb.json
+artifacts/*.parquet
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

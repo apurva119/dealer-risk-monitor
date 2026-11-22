@@ -1,0 +1,193 @@
+{
+  "chosen": {
+    "logreg_C": 0.01,
+    "xgb_depth": 5,
+    "xgb_min_child_weight": 20,
+    "xgb_trees": 126
+  },
+  "metrics": {
+    "Weighted baseline": {
+      "pr_auc": 0.8239973989047215,
+      "pr_auc_ci95": [
+        0.6479954763378525,
+        0.9212861672521319
+      ],
+      "roc_auc": 0.9952659299567221,
+      "pr_auc_not_yet_late": 0.34868362614114246,
+      "weekly_topn": [
+        {
+          "n": 10,
+          "recall": 0.9423913043478259,
+          "precision": 0.32826086956521744,
+          "random_recall": 0.021565174239691124
+        },
+        {
+          "n": 25,
+          "recall": 0.9786231884057971,
+          "precision": 0.13913043478260873,
+          "random_recall": 0.05391293559922782
+        },
+        {
+          "n": 50,
+          "recall": 0.9865942028985507,
+          "precision": 0.07043478260869565,
+          "random_recall": 0.10782587119845564
+        },
+        {
+          "n": 100,
+          "recall": 1.0,
+          "precision": 0.03586956521739131,
+          "random_recall": 0.2156517423969113
+        }
+      ],
+      "event_capture_4w_lead": [
+        {
+          "n": 10,
+          "events": 17,
+          "capture": 0.9411764705882353,
+          "median_lead_weeks": 17.0
+        },
+        {
+          "n": 25,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 18.0
+        },
+        {
+          "n": 50,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 23.0
+        },
+        {
+          "n": 100,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 23.0
+        }
+      ]
+    },
+    "Logistic regression": {
+      "pr_auc": 0.8440743761863513,
+      "pr_auc_ci95": [
+        0.7028663311084964,
+        0.9258551044941297
+      ],
+      "roc_auc": 0.9967688411492446,
+      "pr_auc_not_yet_late": 0.3732486731878691,
+      "weekly_topn": [
+        {
+          "n": 10,
+          "recall": 0.9307971014492753,
+          "precision": 0.3217391304347827,
+          "random_recall": 0.021565174239691124
+        },
+        {
+          "n": 25,
+          "recall": 0.9876811594202898,
+          "precision": 0.14086956521739133,
+          "random_recall": 0.05391293559922782
+        },
+        {
+          "n": 50,
+          "recall": 1.0,
+          "precision": 0.07173913043478262,
+          "random_recall": 0.10782587119845564
+        },
+        {
+          "n": 100,
+          "recall": 1.0,
+          "precision": 0.03586956521739131,
+          "random_recall": 0.2156517423969113
+        }
+      ],
+      "event_capture_4w_lead": [
+        {
+          "n": 10,
+          "events": 17,
+          "capture": 0.9411764705882353,
+          "median_lead_weeks": 16.5
+        },
+        {
+          "n": 25,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 18.0
+        },
+        {
+          "n": 50,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 23.0
+        },
+        {
+          "n": 100,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 23.0
+        }
+      ]
+    },
+    "XGBoost": {
+      "pr_auc": 0.8490415318459089,
+      "pr_auc_ci95": [
+        0.7156235294784674,
+        0.9286511285419758
+      ],
+      "roc_auc": 0.9976713323054326,
+      "pr_auc_not_yet_late": 0.38453863415794975,
+      "weekly_topn": [
+        {
+          "n": 10,
+          "recall": 0.9543478260869563,
+          "precision": 0.33478260869565224,
+          "random_recall": 0.021565174239691124
+        },
+        {
+          "n": 25,
+          "recall": 1.0,
+          "precision": 0.14347826086956525,
+          "random_recall": 0.05391293559922782
+        },
+        {
+          "n": 50,
+          "recall": 1.0,
+          "precision": 0.07173913043478262,
+          "random_recall": 0.10782587119845564
+        },
+        {
+          "n": 100,
+          "recall": 1.0,
+          "precision": 0.03586956521739131,
+          "random_recall": 0.2156517423969113
+        }
+      ],
+      "event_capture_4w_lead": [
+        {
+          "n": 10,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 16.0
+        },
+        {
+          "n": 25,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 18.0
+        },
+        {
+          "n": 50,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 21.0
+        },
+        {
+          "n": 100,
+          "events": 17,
+          "capture": 1.0,
+          "median_lead_weeks": 21.0
+        }
+      ]
+    }
+  }
+}
